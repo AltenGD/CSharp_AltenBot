@@ -93,9 +93,8 @@ namespace CSharp_AltenBot.Modules
 
             // 21
             string[] json = responseFromServer.Replace('~', ' ').Split('|', ':');
-
-            Console.WriteLine($"Original text: {responseFromServer}");
-
+            
+            
             reader.Close();
             dataStream.Close();
             response.Close();
