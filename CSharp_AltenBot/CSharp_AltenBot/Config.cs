@@ -24,6 +24,8 @@ namespace CSharp_AltenBot
                 bot = new BotConfig();
                 string json = JsonConvert.SerializeObject(bot, Formatting.Indented);
                 File.WriteAllText(configFolder + "/" + configFile, json);
+
+                // Reminds the user to edit the config.json file
                 Console.WriteLine($"File: {configFile} has been created in bin/{configFolder}, Please go and edit that file to include your Token and a Prefix");
                 Console.ReadKey();
             }
