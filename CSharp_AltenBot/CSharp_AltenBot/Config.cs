@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,6 +24,8 @@ namespace CSharp_AltenBot
                 bot = new BotConfig();
                 string json = JsonConvert.SerializeObject(bot, Formatting.Indented);
                 File.WriteAllText(configFolder + "/" + configFile, json);
+                Console.WriteLine($"File: {configFile} has been created in bin/{configFolder}, Please go and edit that file to include your Token and a Prefix");
+                Console.ReadKey();
             }
             else
             {
