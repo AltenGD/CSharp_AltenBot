@@ -1,14 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.IO;
-using System.Net.Http;
 using System.Net;
-using System.ComponentModel;
-
 
 namespace CSharp_AltenBot
 {
@@ -30,7 +25,6 @@ namespace CSharp_AltenBot
             request.Method = "POST";
             string postData = Parameters;
             byte[] byteArray = Encoding.UTF8.GetBytes(postData);
-            Console.WriteLine($"Url: {Url}\nParameters: {Parameters}");
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = byteArray.Length;
             Stream dataStream = request.GetRequestStream();
@@ -43,20 +37,34 @@ namespace CSharp_AltenBot
             reader.Close();
             dataStream.Close();
             response.Close();
-            Console.WriteLine(responseFromServer);
             return responseFromServer;
         }
 
-        public static string[] GetLevelPacket(string name, string p = "0")
+
+        //fuck this is so bad
+        public static string[] GetLevelPacket(string Level)
         {
-            string Params = $"gameVersion=21&binaryVersion=35&gdw=0&type=0&str={name}&page={p}&secret=Wmfd2893gb7";
-            string Packet = SendPostRequest("http://boomlings.com/database/getGJLevels21.php", Params);
-            string[] LevelPacket = Packet.Replace('~', ' ').Split('|', ':');
-            return LevelPacket;
+            int value;
+            if (int.TryParse(Level, out value))
+            {
+                string Params = $"gameVersion=21&binaryVersion=35&gdw=0&type=0&str={Level}&diff=-&len=-&page=0&total=0&uncompleted=0&onlyCompleted=0&featured=0&original=0&twoPlayer=0&coins=0&epic=0&secret=Wmfd2893gb7";
+                string Packet = SendPostRequest("http://boomlings.com/database/getGJLevels21.php", Params);
+                string[] LevelPacket = Packet.Replace('~', ' ').Split('|', ':');
+                return LevelPacket;
+            }
+            else
+            {
+                string Paramss = $"gameVersion=21&binaryVersion=35&gdw=0&type=0&str={Level}&diff=-&len=-&page=0&total=0&uncompleted=0&onlyCompleted=0&featured=0&original=0&twoPlayer=0&coins=0&epic=0&secret=Wmfd2893gb7";
+                string Packetss = SendPostRequest("http://boomlings.com/database/getGJLevels21.php", Paramss);
+                string[] LevelPacketss = Packetss.Split(':');
+                string LevelID = LevelPacketss[1];
+                string Params = $"gameVersion=21&binaryVersion=35&gdw=0&type=0&str={LevelID}&diff=-&len=-&page=0&total=0&uncompleted=0&onlyCompleted=0&featured=0&original=0&twoPlayer=0&coins=0&epic=0&secret=Wmfd2893gb7";
+                string Packet = SendPostRequest("http://boomlings.com/database/getGJLevels21.php", Params);
+                string[] LevelPacket = Packet.Replace('~', ' ').Split('|', ':');
+                return LevelPacket;
+            }
         }
-
-
-    public static string GetAlert(string key)
+        public static string GetAlert(string key)
         {
             if (alerts.ContainsKey(key)) return alerts[key];
             return "";

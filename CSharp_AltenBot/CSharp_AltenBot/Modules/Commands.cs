@@ -1,41 +1,41 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Net;
-using Discord;
-using Discord.Commands;
+using DSharpPlus.CommandsNext;
+using DSharpPlus.CommandsNext.Attributes;
+using DSharpPlus.Entities;
 using NReco.ImageGenerator;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Net.Http;
-using CSharp_AltenBot;
+
+
 namespace CSharp_AltenBot.Modules
 {
-    public class Commands : ModuleBase<SocketCommandContext>
+    public class NormalCommands
     {
         [Command("echo")]
-        public async Task Echo ([Remainder]string message)
+        public async Task Echo(CommandContext context, params string[] message)
         {
-            var embed = new EmbedBuilder();
-            embed.WithTitle("Echoed message");
-            embed.WithDescription(message);
-            embed.WithColor(new Color(30, 255, 30));
+            var embed = new DiscordEmbedBuilder
+            {
+                Title = "Echoed message",
+                Description = string.Join(" ", message),
+                Color = new DiscordColor(0x1EFF1E),
+            };
 
-            await Context.Channel.SendMessageAsync("", false, embed);
+            await context.Message.RespondAsync("", false, embed);
         }
 
+
         [Command("egg")]
-        public async Task Egg ()
+        public async Task Eggs(CommandContext Context)
         {
             await Context.Channel.SendMessageAsync("DECEARING EGG");
         }
 
         [Command("htmltest")]
-        [RequireOwner(Group = "184061887212814336")]
-        public async Task HtmlTest (string color = "red")
+        public async Task HtmlTest(CommandContext Context, string color = "red")
         {
             string css = "<style>\n h1{\n color: " + color + ";\n }\n</style>\n";
             string html = string.Format("<h1>ya mom gay, {0} </h1>", Context.User.Username);
@@ -50,33 +50,85 @@ namespace CSharp_AltenBot.Modules
 
         //Will Update later
         [Command("level")]
-        public async Task level (string level, string page = "0")
+        public async Task level(CommandContext Context, string level)
         {
-            string[] PacketSplit = Utilities.GetLevelPacket(level, page);
+            string[] PacketSplit = Utilities.GetLevelPacket(level);
             string Desc = Encoding.UTF8.GetString(Convert.FromBase64String(PacketSplit[35]));
             string song = WebUtility.UrlDecode(PacketSplit[68]);
-            var embed = new EmbedBuilder(); 
+            var embed = new DiscordEmbedBuilder
+            {
+                Color = new DiscordColor(0x28FFC5),
+            };
             embed.AddField($"<:info:453605020529721356> Level info:", $"{PacketSplit[3]} by {PacketSplit[54]}\n**Description: **{Desc}\n**Difficulty: ** {PacketSplit[27]}☆\n<:download:453603249027678239> {PacketSplit[13]} <:like:453605515302535189> {PacketSplit[19]}", true);
             embed.AddField($"<:info:453605020529721356> Song info:", $"**Song ID: **{PacketSplit[56]}\n**Song Name: **[{PacketSplit[58]}]({song})\n**By: **{PacketSplit[62]}", true);
-            embed.WithColor(new Color(40, 255, 197));
             await Context.Channel.SendMessageAsync("", false, embed);
         }
 
-        // cleaned up a little bit of this  
         [Command("user")]
-        public async Task user (string user)
+        public async Task User(CommandContext Context, params string[] u)
         {
+            string user = string.Join(" ", u);
             // First post request (gets the ID)
-            string egg = Utilities.SendPostRequest("http://boomlings.com/database/getGJUsers20.php", $"gameVersion=21&binaryVersion=35&gdw=0&str={user}&secret=Wmfd2893gb7");
-            string[] json = egg.Replace('~', ' ').Split('|', ':');
-            Console.WriteLine(egg);
+
+            WebRequest request = WebRequest.Create("http://boomlings.com/database/getGJUsers20.php");
+            request.Method = "POST";
+
+            string postData = $"gameVersion=21&binaryVersion=35&gdw=0&str={user}&secret=Wmfd2893gb7";
+            byte[] byteArray = Encoding.UTF8.GetBytes(postData);
+
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = byteArray.Length;
+
+            Stream dataStream = request.GetRequestStream();
+            dataStream.Write(byteArray, 0, byteArray.Length);
+
+            dataStream.Close();
+            WebResponse response = request.GetResponse();
+
+            Console.WriteLine(((HttpWebResponse)response).StatusDescription);
+            dataStream = response.GetResponseStream();
+
+            StreamReader reader = new StreamReader(dataStream);
+            string responseFromServer = reader.ReadToEnd();
+
+            // 21
+            string[] json = responseFromServer.Replace('~', ' ').Split('|', ':');
+            
+            
+            reader.Close();
+            dataStream.Close();
+            response.Close();
 
             // Second post request (gets the actual user info)
-            string egg2 = Utilities.SendPostRequest("http://boomlings.com/database/getGJUserInfo20.php", $"gameVersion=21&binaryVersion=35&gdw=0&accountID=0&gjp=0&targetAccountID={json[21]}&secret=Wmfd2893gb7");
-            string[] json2 = egg2.Replace('~', ' ').Split('|', ':');
-            Console.WriteLine(egg2);
 
-            var embed = new EmbedBuilder();
+            WebRequest request2 = WebRequest.Create("http://boomlings.com/database/getGJUserInfo20.php");
+            request2.Method = "POST";
+
+            string postData2 = $"gameVersion=21&binaryVersion=35&gdw=0&accountID=0&gjp=0&targetAccountID={json[21]}&secret=Wmfd2893gb7";
+            byte[] byteArray2 = Encoding.UTF8.GetBytes(postData2);
+
+            request2.ContentType = "application/x-www-form-urlencoded";
+            request2.ContentLength = byteArray2.Length;
+
+            Stream dataStream2 = request2.GetRequestStream();
+            dataStream2.Write(byteArray2, 0, byteArray2.Length);
+
+            dataStream2.Close();
+            WebResponse response2 = request2.GetResponse();
+
+            Console.WriteLine(((HttpWebResponse)response2).StatusDescription);
+            dataStream2 = response2.GetResponseStream();
+
+            StreamReader reader2 = new StreamReader(dataStream2);
+            string responseFromServer2 = reader2.ReadToEnd();
+
+            // 21
+            string[] json2 = responseFromServer2.Replace('~', ' ').Split('|', ':');
+
+            Console.WriteLine($"Original text: {responseFromServer2}");
+
+
+            var embed = new DiscordEmbedBuilder();
 
             // YT = 27; Twitter = 53; Twitch = 55
             /*
@@ -88,7 +140,6 @@ namespace CSharp_AltenBot.Modules
             Twitt
             Twitc
              */
-
             if (json2[27] != "" && json2[53] != "" && json2[55] != "")
             {
                 embed.AddField(json2[1], $"[<:youtube:454688131208314882> Open channel](https://www.youtube.com/channel/{json2[27]}) [<:twitter:454688993297039360> @{json2[53]}](https://twitter.com/{json2[53]}) [<:Twitch_icon:454688993259290654> {json2[55]}](https://www.twitch.tv/{json2[55]})");
@@ -124,32 +175,33 @@ namespace CSharp_AltenBot.Modules
             embed.AddField("User stats", $"**Global rank: **{json2[47]}\n**Stars: **{json2[13]}\n**Diamonds: **{json2[15]}\n**Official coins: **{json2[5]}\n**User coins: **{json2[7]}");
 
             await Context.Channel.SendMessageAsync("", false, embed);
+
+            reader2.Close();
+            dataStream2.Close();
+            response2.Close();
         }
 
         [Command("shutdown")]
-        [RequireOwner(Group = "184061887212814336")]
-        public async Task shutdown ()
+        public async Task Shutdown(CommandContext Context)
         {
             await Context.Channel.SendMessageAsync("Shutting down...");
-            await Context.Client.SetStatusAsync(UserStatus.Invisible);
-
-            await Context.Client.StopAsync();
-            await Task.Delay(5000);
+            await Context.Client.DisconnectAsync();
             Environment.Exit(0);
         }
 
         [Command("setgame")]
-        [RequireOwner(Group = "184061887212814336")]
-        public async Task game ([Remainder]string gameMessage)
+        public async Task SetGame(CommandContext Context, params string[] gameMessage)
         {
-            await Context.Channel.SendMessageAsync($"Setting game status to: {gameMessage}");
-            await Context.Client.SetGameAsync(gameMessage);
+            string game = string.Join(" ", gameMessage);
+            await Context.Channel.SendMessageAsync($"Setting game status to: {game}");
+            await Context.Client.UpdateStatusAsync(new DiscordGame(game));
         }
 
         [Command("texttoimage")]
-        [Alias("t2i")]
-        public async Task texttoimage ([Remainder] string message)
+        [Aliases("t2i")]
+        public async Task TextToImage(CommandContext Context, params string[] msg)
         {
+            string message = string.Join(" ", msg);
             string css = "<style>\n h1{\n color: rgb(51,51,51);\n }\n</style>\n";
             string html = string.Format("<h1>{0}</h1>", message);
             var converter = new HtmlToImageConverter
@@ -157,22 +209,21 @@ namespace CSharp_AltenBot.Modules
                 Width = 1920,
                 Height = 600
             };
-            var pngBytes = converter.GenerateImage(css = html, NReco.ImageGenerator.ImageFormat.Png);
+            var pngBytes = converter.GenerateImage(css = html, ImageFormat.Png);
             await Context.Channel.SendFileAsync(new MemoryStream(pngBytes), "gya.png");
         }
 
         [Command("renderhtml")]
-        [Alias("rhtml", "reht")]
-        public async Task RenderHTML ([Remainder]string url)
+        public async Task RenderHTML(CommandContext Context, params string[] url)
         {
             using (HttpClient client = new HttpClient())
             {
-                using (HttpResponseMessage response = await client.GetAsync(url))
+                using (HttpResponseMessage response = await client.GetAsync(string.Join(" ", url)))
                 {
                     using (HttpContent content = response.Content)
                     {
                         string myContent = await content.ReadAsStringAsync();
-                        string html = string.Format("{0}", myContent);  
+                        string html = string.Format("{0}", myContent);
                         var converter = new HtmlToImageConverter
                         {
                             Width = 1920,
@@ -186,8 +237,7 @@ namespace CSharp_AltenBot.Modules
         }
 
         [Command("color")]
-        [Alias("col", "colour")]
-        public async Task color ([Remainder] string col)
+        public async Task Color(CommandContext Context, params string[] col)
         {
             string html = string.Format("<body bgcolor=\"{0}\">", col);
             var converter = new HtmlToImageConverter
@@ -195,15 +245,14 @@ namespace CSharp_AltenBot.Modules
                 Width = 800,
                 Height = 800
             };
-            var pngBytes = converter.GenerateImage(html, NReco.ImageGenerator.ImageFormat.Png);
+            var pngBytes = converter.GenerateImage(html, ImageFormat.Png);
             await Context.Channel.SendFileAsync(new MemoryStream(pngBytes), "gya.png");
         }
 
         [Command("help")]
-        [Alias("commands")]
-        public async Task help ()
+        public async Task Help(CommandContext Context)
         {
-            var embed = new EmbedBuilder();
+            var embed = new DiscordEmbedBuilder();
             embed.AddField("Echo, Aliases: None", "Echoes whatever you want");
             embed.AddField("Egg, Aliases: None", "egg");
             embed.AddField("Level, Aliases: None", "Shows information about a level");
@@ -212,7 +261,7 @@ namespace CSharp_AltenBot.Modules
             embed.AddField("RenderHTML, Aliases: rhtml, reht", "Renders a site (css will be missing if its on a different file)");
             embed.AddField("Color, Aliases: col, colour", "Shows a color of your choice");
             embed.AddField("Help, Aliases: Commands", "Shows all the available commands");
-            embed.WithColor(new Color(114, 137, 218));
+            embed.WithColor(new DiscordColor(0x7289DA));
 
             await Context.Channel.SendMessageAsync("", false, embed);
         }
