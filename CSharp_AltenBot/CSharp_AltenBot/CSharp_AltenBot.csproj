@@ -165,7 +165,6 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="LevelInfo.cs" />
     <Compile Include="Modules\Commands.cs" />
     <Compile Include="Bot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
