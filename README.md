@@ -18,11 +18,3 @@
   * Echo command
   * Leveling system (coming soon)
   * And much more!
-  ----
-  ### How to join the developpment
-  * Requirements:
-    1. Have experience in programing
-    2. Have experience with c#
-    3. Know how to create a bot in c#
-  * if you meet all requirements, contact me on discord: Alteb#4148
-    
