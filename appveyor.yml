@@ -6,7 +6,7 @@ pull_requests:
 environment: 
   SolutionDir: CSharp_AltenBot/
 build:
-  project: CSharp_AltenBot/
+  project: CSharp_AltenBot/CSharp_AltenBot.sln
   publish_core_console: true
   verbosity: minimal
 notifications:
