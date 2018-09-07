@@ -7,7 +7,7 @@ environment:
   WEBHOOK_URL:
     secure: iGW1I2Gs3o0hzHyPPRhbvnbfhMY1qIjcCMVUeBguWgCF3g7jAmIRdG9vVJwoTpVoqsUAQEwofUt9C2MaU5GQZNuj7fuvd6EbcR3hHnU3WqWYapAvjelQy2Rp3b5qBhSPlMz42q68f7jTNWfTWQnMeVbRfegvmEGAmXi65OsvAP4=
 build:
-  project: CSharp_Altenbot\CSharp_Altenbot.sln
+  project: CSharp_AltenBot/CSharp_AltenBot.sln
   publish_core_console: true
   verbosity: minimal
 notifications:
