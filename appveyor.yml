@@ -7,3 +7,10 @@ environment:
 build:
   publish_core_console: true
   verbosity: minimal
+notifications:
+- provider: Webhook
+  url: https://discordapp.com/api/webhooks/487416853040463883/OvjSYMQsTvmhiumqFX4eIVXCoVoAexOGnut_sZBIdQHMOUVOS2EHqW0iMAidC2wr09hb
+  method: POST
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
