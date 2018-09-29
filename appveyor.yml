@@ -1,0 +1,18 @@
+version: 1.0.{build}
+before_build:
+  - nuget restore
+pull_requests:
+  do_not_increment_build_number: true
+environment: 
+  SolutionDir: CSharp_AltenBot/
+build:
+  project: CSharp_AltenBot/CSharp_AltenBot.sln
+  publish_core_console: true
+  verbosity: minimal
+notifications:
+- provider: Webhook
+  url: https://discordapp.com/api/webhooks/487416853040463883/OvjSYMQsTvmhiumqFX4eIVXCoVoAexOGnut_sZBIdQHMOUVOS2EHqW0iMAidC2wr09hb
+  method: POST
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
